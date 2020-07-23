@@ -7,12 +7,8 @@ function App() {
   const [repositories, setRepositories] = useState([]);
 
   useEffect(() => {
-    loadRepository();
-  });
-
-  async function loadRepository() {
     api.get("/repositories").then((response) => setRepositories(response.data));
-  }
+  }, []);
 
   async function handleAddRepository() {
     const text = {
@@ -27,16 +23,22 @@ function App() {
   }
 
   async function handleRemoveRepository(id) {
-    const response = await api.delete(`/repositories/${id}`);
+    const { data } = await api.delete(`/repositories/${id}`);
+
+    const repo = repositories.filter((item) => {
+      return item.id !== id;
+    });
+
+    console.log(repo);
+    setRepositories(repo);
   }
 
   return (
     <div>
       <ul data-testid="repository-list">
         {repositories.map((repository) => (
-          <li>
+          <li key={repository.id}>
             {repository?.title}
-
             <button onClick={() => handleRemoveRepository(repository?.id)}>
               Remover
             </button>
